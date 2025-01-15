@@ -67,28 +67,60 @@ for epoch in range(20000):
 print("Trained outputs:")
 print(a2)
 
+# MY visualizer
 # view the function outputs to see non-linear decision boundary
 # take a grid of points from x, y = [-1, 2], get outputs, color those above .5 as green, below .5 as red
-grid_size = 100
-boundary = 0.5
+# grid_size = 100
+# boundary = 0.5
 
-x = np.linspace(-1, 2, grid_size)
+# x = np.linspace(-1, 2, grid_size)
 # y = np.linspace(-1, 2, grid_size)
-y = np.linspace(-1, 2, grid_size)
-xx, yy = np.meshgrid(x, y)
+# xx, yy = np.meshgrid(x, y)
 
-# input needs to be N x 2
-# grid_X = np.stack([xx.flatten(), yy.flatten()]).T
-grid_X = np.stack([yy.flatten()[::-1], xx.flatten()]).T
-z1 = np.dot(grid_X, W1) + b1  # Input to hidden layer
-a1 = sigmoid(z1)         # Activation at hidden layer
-z2 = np.dot(a1, W2) + b2 # Input to output layer
-a2 = sigmoid(z2)         # Activation at output layer (final prediction)
+# # input needs to be N x 2
+# grid_X = np.stack([yy.flatten()[::-1], xx.flatten()]).T
+# z1 = np.dot(grid_X, W1) + b1  # Input to hidden layer
+# a1 = sigmoid(z1)         # Activation at hidden layer
+# z2 = np.dot(a1, W2) + b2 # Input to output layer
+# a2 = sigmoid(z2)         # Activation at output layer (final prediction)
 
+# # outs = a2.reshape(grid_size, grid_size)
 # outs = a2.reshape(grid_size, grid_size)
-outs = a2.reshape(grid_size, grid_size)
 
-plt.imshow(outs, extent=[-1, 2, -1, 2])
-plt.scatter(X[:, 0], X[:, 1])
-plt.colorbar()
+# plt.imshow(outs, extent=[-1, 2, -1, 2])
+# plt.scatter(X[:, 0], X[:, 1])
+# plt.colorbar()
+# plt.show()
+
+# chatgpt's visualizer
+
+# Generate a grid of points to represent the input space
+x_min, x_max = X[:, 0].min() - 0.1, X[:, 0].max() + 0.1
+y_min, y_max = X[:, 1].min() - 0.1, X[:, 1].max() + 0.1
+xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), np.linspace(y_min, y_max, 100))
+
+# Prepare input grid for prediction
+grid_points = np.c_[xx.ravel(), yy.ravel()]  # same as column stack, ravel same as flatten
+
+# Forward pass for the grid points
+z1_grid = np.dot(grid_points, W1) + b1
+a1_grid = sigmoid(z1_grid)
+z2_grid = np.dot(a1_grid, W2) + b2
+a2_grid = sigmoid(z2_grid)
+
+# Reshape predictions to match grid shape
+a2_grid = a2_grid.reshape(xx.shape)
+
+# Plot decision boundary
+plt.figure(figsize=(8, 6))
+plt.contourf(xx, yy, a2_grid, levels=50, cmap="RdYlBu", alpha=0.8)
+plt.colorbar(label="Output Activation")
+
+# Overlay training data
+plt.scatter(X[:, 0], X[:, 1], c=y.flatten(), edgecolor='k', cmap="RdYlBu", s=100, label="Training Data")
+plt.title("Non-linear Decision Boundary")
+plt.xlabel("Input 1")
+plt.ylabel("Input 2")
+plt.legend()
+
 plt.show()
