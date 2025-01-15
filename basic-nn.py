@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 # Define the network structure
 input_size = 2
@@ -27,7 +28,7 @@ y = np.array([[0], [1], [1], [0]])
 lr = 0.1
 
 # Training loop
-for epoch in range(10000):
+for epoch in range(20000):
     # Forward pass
     z1 = np.dot(X, W1) + b1  # Input to hidden layer
     a1 = sigmoid(z1)         # Activation at hidden layer
@@ -66,3 +67,28 @@ for epoch in range(10000):
 print("Trained outputs:")
 print(a2)
 
+# view the function outputs to see non-linear decision boundary
+# take a grid of points from x, y = [-1, 2], get outputs, color those above .5 as green, below .5 as red
+grid_size = 100
+boundary = 0.5
+
+x = np.linspace(-1, 2, grid_size)
+# y = np.linspace(-1, 2, grid_size)
+y = np.linspace(-1, 2, grid_size)
+xx, yy = np.meshgrid(x, y)
+
+# input needs to be N x 2
+# grid_X = np.stack([xx.flatten(), yy.flatten()]).T
+grid_X = np.stack([yy.flatten()[::-1], xx.flatten()]).T
+z1 = np.dot(grid_X, W1) + b1  # Input to hidden layer
+a1 = sigmoid(z1)         # Activation at hidden layer
+z2 = np.dot(a1, W2) + b2 # Input to output layer
+a2 = sigmoid(z2)         # Activation at output layer (final prediction)
+
+# outs = a2.reshape(grid_size, grid_size)
+outs = a2.reshape(grid_size, grid_size)
+
+plt.imshow(outs, extent=[-1, 2, -1, 2])
+plt.scatter(X[:, 0], X[:, 1])
+plt.colorbar()
+plt.show()
